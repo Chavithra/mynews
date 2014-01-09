@@ -1,2 +1,8 @@
-mail -s "email title" chavithra@gmail.com < articles
+html=$(<articles)
 
+(
+    echo "To: chavithra@gmail.com"
+    echo "Subject: Articles"
+    echo "Content-Type: text/html"
+    echo $html;
+) | /usr/sbin/sendmail -t
