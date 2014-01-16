@@ -16,7 +16,7 @@ chooseEmail()
 # Output : file "config_dico"
 chooseDictionary()
 {
-    read -p "Veuillez saisir vos filtres séparés par des signes \"+\" : " dictionary
+    read -p "Veuillez saisir vos mots clés séparés par des signes \"+\" : " dictionary
 
     echo $dictionary > config_dico
 }
@@ -35,7 +35,7 @@ askCrontab()
    # Install the new crontab
    crontab mycron
    
-   echo "Votre configuration est sauvegardée"
+   echo "Bravo ! Votre configuration est sauvegardée :-) "
 }
 
 
