@@ -1,8 +1,10 @@
-dictionary=""
+#dictionary=""
 
-for params in "$@"
-do
-    dictionary+=$params"+"
-done
+#for params in "$@"
+#do
+#    dictionary+=$params"+"
+#done
 
-echo ${dictionary:0:-1} > dico
+read -p "Veuillez saisir vos filtres séparés par des signe \"+\" : " dictionary
+
+echo ${dictionary:0:-1}

@@ -1,6 +1,29 @@
+chooseEmail()
+{
+    read -p "Veuillez saisir votre adresse email : " email
+
+    echo $email >  config_email
+}
+
+chooseDictionary()
+{
+    read -p "Veuillez saisir vos filtres séparés par des signe \"+\" : " dictionary
+
+    echo ${dictionary:0:-1} > config_dico
+}
+
+askCrontab()
+{
+   read -p "Veuillez configurer la crontab : " cron
+
+   echo "$cron cd /var/www/mynews/; sh /var/www/mynews/bot.sh -o=launch" > mycron
+
+   crontab mycron
+}
+
 fetchUrls()
 {
-    dictionary=$(<dico)
+    dictionary=$(<config_dico)
 
     url="http://www.lemonde.fr/recherche/?keywords="
     url+=$dictionary
@@ -13,7 +36,7 @@ fetchUrls()
 
 fetchArticles()
 {
-#    echo "<html><head><title>Articles</title></head><body>" > articles;
+    echo "<html><head><title>Articles</title></head><body>" > articles;
 
     for url in $(cat urls)
     do
@@ -40,7 +63,30 @@ sendArticles()
     ) | /usr/sbin/sendmail -t
 };
 
-fetchUrls
-fetchArticles
-sendArticles
+for param in "$@"
+do
+    option=${param%%=*}
+    value=${param##*=}
 
+    case $option in
+        -p | --password)        password=$value;;
+        -l | --login)           login=$value;;
+        -o | --operation)       operation=$value;;
+    esac
+done
+
+if [ "$operation" == "" ]; then
+    echo "Please choose an operation typing : sh $0 -o=my_operation"
+fi
+
+if [ "$operation" == "config" ]; then
+    chooseEmail
+    chooseDictionary
+    askCrontab
+fi
+
+if [ "$operation" == "launch" ]; then
+    fetchUrls
+    fetchArticles
+    sendArticles
+fi
