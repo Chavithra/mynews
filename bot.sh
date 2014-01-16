@@ -42,24 +42,28 @@ askCrontab()
 # Fetch urls of articles according to the dictionary
 fetchUrls()
 {
-    # Store "config_dico" in the variable dictionary
+    # Retrieve "config_dico" in the variable dictionary
     dictionary=$(<config_dico)
     
-    # Stored the url of the research with the dictionary
+    # Store the url of the research with the dictionary
     url="http://www.lemonde.fr/recherche/?keywords="
     url+=$dictionary
     url+="&page_num=1&operator=or&exclude_keywords=&qt=recherche_texte_titre&author=&period=for_1_week&start_day=01&start_month=01&start_year=1944&end_day=20&end_month=12&end_year=2013&sort=desc"
 
+    # Store the source code of url in "site.html"
     wget $url -O  site.html
 
+    # Extract the urls of each link of the research (in "urls" )
     grep "grid_3 alpha obf" site.html | awk -F "\"" '/grid_3 alpha obf/ {print"http://www.lemonde.fr"$2}' > urls;
 };
+
 
 # Fetch the contains of the articles
 fetchArticles()
 {
     echo "<html><head><title>Articles</title></head><body>" > articles;
 
+    # Store the source code of each article at the end of the files "articles"
     for url in $(cat urls)
     do
        curl $url > article.html
@@ -69,23 +73,28 @@ fetchArticles()
     echo "</body></html>" >> articles;
 };
 
+
 # Send the articles
 sendArticles()
 {
+    # Retrieve the email of the user in "mail" 
     mail=$(<config_email)
 
     echo "On est en train d'envoyer l'email à l'adresse $mail"
 
     html=$(<articles)
 
+    # Configuration of the recipient, the subject and the content
     (
         echo "To: $mail"
-        echo "Subject: Articles"
+        echo "Subject: [myNews] Articles"
         echo "Content-Type: text/html"
         echo $html;
     ) | /usr/sbin/sendmail -t
 };
 
+
+# Retrieve the value of the option "o" or "operation" of the program in the variable "operation"
 for param in "$@"
 do
     option=${param%%=*}
@@ -95,6 +104,7 @@ do
         -o | --operation)       operation=$value;
     esac
 done
+
 
 # Matching on the variable "operation"
 # The variable hasn't been defined
