@@ -16,7 +16,7 @@ chooseEmail()
 # Output : file "config_dico"
 chooseDictionary()
 {
-    read -p "Veuillez saisir vos filtres séparés par des signe \"+\" : " dictionary
+    read -p "Veuillez saisir vos filtres séparés par des signes \"+\" : " dictionary
 
     echo $dictionary > config_dico
 }
