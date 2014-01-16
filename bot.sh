@@ -30,7 +30,7 @@ askCrontab()
    
    read -p "Veuillez configurer la crontab : " cron
 
-   echo "$cron cd /var/www/mynews/; sh /var/www/mynews/bot.sh -o=launch" > mycron
+   echo "$cron cd /var/www/mynews/; sh $PWD/bot.sh -o=launch" > mycron
     
    # Install the new crontab
    crontab mycron
