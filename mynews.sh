@@ -1,49 +1,46 @@
 # Allow the user to configure his email address
 # Input : user
-# Output : file "config_email"
+# Output : file "config/email.conf"
 chooseEmail()
 {
     # Display the msg and read the answer of the user
     read -p "Veuillez saisir votre adresse email : " email
 
     # Save the email written by the user
-    echo $email >  config_email
+    echo $email > "config/email.conf"
 }
-
 
 # Allow the user to configure his dictionary
 # Input : user
-# Output : file "config_dico"
+# Output : file "config/dictionary.conf"
 chooseDictionary()
 {
     read -p "Veuillez saisir vos mots clés séparés par des signes \"+\" : " dictionary
 
-    echo $dictionary > config_dico
+    echo $dictionary > "config/dictionary.conf"
 }
-
 
 # Allow the user to configure the crontab
 askCrontab()
 {
    # Back up the crontab
-   crontab -l > mycron
+   crontab -l > mycron.tmp
    
    read -p "Veuillez configurer la crontab : " cron
 
-   echo "$cron cd $PWD/; sh $PWD/bot.sh -o=launch" > mycron
+   echo "$cron cd $PWD/; sh $PWD/mynews.sh -o=launch" >> mycron.tmp
     
    # Install the new crontab
-   crontab mycron
+   crontab mycron.tmp
    
-   echo "Bravo ! Votre configuration est sauvegardée :-) "
+   echo "Bravo ! Votre configuration a été sauvegardée :-) "
 }
-
 
 # Fetch urls of articles according to the dictionary
 fetchUrls()
 {
-    # Retrieve "config_dico" in the variable dictionary
-    dictionary=$(<config_dico)
+    # Retrieve "config/dictionary.conf" in the variable dictionary
+    dictionary=$(<"config/dictionary.conf")
     
     # Store the url of the research with the dictionary
     url="http://www.lemonde.fr/recherche/?keywords="
@@ -51,38 +48,36 @@ fetchUrls()
     url+="&page_num=1&operator=or&exclude_keywords=&qt=recherche_texte_titre&author=&period=for_1_week&start_day=01&start_month=01&start_year=1944&end_day=20&end_month=12&end_year=2013&sort=desc"
 
     # Store the source code of url in "site.html"
-    wget $url -O  site.html
+    wget $url -O  site.html.tmp
 
     # Extract the urls of each link of the research (in "urls" )
-    grep "grid_3 alpha obf" site.html | awk -F "\"" '/grid_3 alpha obf/ {print"http://www.lemonde.fr"$2}' > urls;
+    grep "grid_3 alpha obf" site.html.tmp | awk -F "\"" '/grid_3 alpha obf/ {print"http://www.lemonde.fr"$2}' > urls;
 };
-
 
 # Fetch the contains of the articles
 fetchArticles()
 {
-    echo "<html><head><title>Articles</title></head><body>" > articles;
+    echo "<html><head><title>Articles</title></head><body>" > articles.tmp;
 
     # Store the source code of each article at the end of the files "articles"
     for url in $(cat urls)
     do
-       curl $url > article.html
-       awk '/<article class=\"article article_normal\"/,/<\/article>/' article.html >> articles;
+       curl $url > article.html.tmp
+       awk '/<article class=\"article article_normal\"/,/<\/article>/' article.html.tmp >> articles.tmp;
     done
 
-    echo "</body></html>" >> articles;
+    echo "</body></html>" >> articles.tmp;
 };
-
 
 # Send the articles
 sendArticles()
 {
     # Retrieve the email of the user in "mail" 
-    mail=$(<config_email)
+    mail=$(<"config/email.conf")
 
-    echo "On est en train d'envoyer l'email à l'adresse $mail"
+    echo "L'email est en cours d'envoi à l'adresse $mail"
 
-    html=$(<articles)
+    html=$(<articles.tmp)
 
     # Configuration of the recipient, the subject and the content
     (
@@ -93,7 +88,6 @@ sendArticles()
     ) | /usr/sbin/sendmail -t
 };
 
-
 # Retrieve the value of the option "o" or "operation" of the program in the variable "operation"
 for param in "$@"
 do
@@ -101,10 +95,9 @@ do
     value=${param##*=}
 
     case $option in
-        -o | --operation)       operation=$value;
+        -o | --operation | --option)       operation=$value;
     esac
 done
-
 
 # Matching on the variable "operation"
 # The variable hasn't been defined
