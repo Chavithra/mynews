@@ -3,6 +3,9 @@
 # Output : file "config/email.conf"
 chooseEmail()
 {
+    # Create "config" folder if it doesn't exist
+    mkdir -p config
+    
     # Display the msg and read the answer of the user
     read -p "Veuillez saisir votre adresse email : " email
 
