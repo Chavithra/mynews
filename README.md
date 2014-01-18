@@ -1,4 +1,0 @@
-mynews
-======
-
-mynews
