@@ -54,7 +54,7 @@ fetchUrls()
     wget $url -O  site.html.tmp
 
     # Extract the urls of each link of the research (in "urls" )
-    grep "grid_3 alpha obf" site.html.tmp | awk -F "\"" '/grid_3 alpha obf/ {print"http://www.lemonde.fr"$2}' > urls;
+    grep "grid_3 alpha obf" site.html.tmp | awk -F "\"" '/grid_3 alpha obf/ {print"http://www.lemonde.fr"$2}' > urls.tmp;
 };
 
 # Fetch the contains of the articles
@@ -63,7 +63,7 @@ fetchArticles()
     echo "<html><head><title>Articles</title></head><body>" > articles.tmp;
 
     # Store the source code of each article at the end of the files "articles"
-    for url in $(cat urls)
+    for url in $(cat urls.tmp)
     do
        curl $url > article.html.tmp
        awk '/<article class=\"article article_normal\"/,/<\/article>/' article.html.tmp >> articles.tmp;
