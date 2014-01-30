@@ -37,6 +37,7 @@ askCrontab()
    crontab mycron.tmp
    
    echo "Bravo ! Votre configuration a été sauvegardée :-) "
+   echo "pour supprimer la configuration crontab : \"crontab -e\" et tout supprimer" 
 }
 
 # Fetch urls of articles according to the dictionary
